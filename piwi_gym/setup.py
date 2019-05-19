@@ -9,7 +9,7 @@ setup(
     zip_safe=False,
     install_requires=['gym', 'keras', 'tensorflow',
                       'asyncio', 'numpy',
-                      'prettyprinter', 'talib',
+                      'prettyprinter',
                       'dash', 'plotly', 'dash_daq',
                       'dash_html_components','dash_core_components',
                       'pandas', 'sklearn']

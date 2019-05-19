@@ -5,7 +5,7 @@ from piwi_gym.configs import *
 class SimulationFE(object):
 
     def __init__(self):
-        self.data_fname = train_file
+        self.data_fname = train_file[0]
         self.i_split = tt_split
         self.cols = ['bid', 'ask', 'sell_vol', 'buy_vol', 'return', 'action']
         self.seq_len = sequence_len

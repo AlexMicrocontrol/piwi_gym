@@ -1,0 +1,7 @@
+piwi_gym/data/training/BTC_ETH_2018.csv
+piwi_gym/data/training/BTC_ETH_2017.csv
+piwi_gym/data/account_reports
+piwi_gym/build
+piwi_gym/piwi_gym.egg-info
+piwi_gym/dist
+.idea

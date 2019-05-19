@@ -24,7 +24,7 @@ class MonitoredAccount(object):
 
     def reset(self):
         self._wallet = dict(cash=self._start_cash, coins=self._start_cryptos, loss=0.0, profit=0.0)
-        self.curr_trade = dict(time_stamp=time.strftime('%m-%d-%Y %H:%M:%S'), trade_type='hold', quantity=0,
+        self.curr_trade = dict(time_stamp=time.strftime('%m-%d-%Y %H:%M:%S'), trade_type=hLD, quantity=0,
                                total=0., fee=0., ask_price=0.00001, bid_price=0.00001, curr_idx=0,
                                wallet=self._wallet)
         self.bookkeeping.clear()
@@ -37,11 +37,11 @@ class MonitoredAccount(object):
         elif action == SELL:
             done = self.sell_bid(curr_bid_price)
         elif action == HOLD:
-            self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': 'hold',
+            self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': hLD,
                                'quantity': 0, 'total': 0., 'fee': 0.}
-        self.curr_trade['ask_price'] = curr_ask_price
-        self.curr_trade['bid_price'] = curr_bid_price
-        self.curr_trade['curr_idx'] = curr_idx
+        self.curr_trade[ASK] = curr_ask_price
+        self.curr_trade[BID] = curr_bid_price
+        self.curr_trade[CIDX] = curr_idx
         self.curr_trade['wallet'] = self._wallet
         self.bookkeeping.append(self.curr_trade)
 
@@ -49,33 +49,33 @@ class MonitoredAccount(object):
 
     def buy_ask(self, ask_price):
         '''Purchases at ask price'''
-        cash_expense = self._wallet['cash'] * self._buy_limit_pct
+        cash_expense = self._wallet[CSH] * self._buy_limit_pct
         fee_loss = cash_expense * self._trading_fee
         total_loss = cash_expense + fee_loss
         coins_bought = cash_expense / ask_price
-        self._wallet['coins'] += coins_bought
-        self._wallet['cash'] -= total_loss
-        self._wallet['loss'] += total_loss
-        self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': 'buy_ask',
+        self._wallet[ASST] += coins_bought
+        self._wallet[CSH] -= total_loss
+        self._wallet[LSS] += total_loss
+        self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': BASK,
                            # 'bid_price': bid_price, 'ask_price': ask_price,
                            'quantity': coins_bought, 'total': total_loss,
                            'fee': fee_loss}
         done = False
-        if self._wallet['cash'] < 0.0001:
+        if self._wallet[CSH] < 0.0001:
             done = True
 
         return done
 
     def sell_bid(self, bid_price):
         '''sales at bid price'''
-        selling_coins = self._wallet['coins'] * self._sell_limit_pct
+        selling_coins = self._wallet[ASST] * self._sell_limit_pct
         cash_takings = selling_coins * bid_price
         fee_loss = cash_takings * self._trading_fee
         total_takings = cash_takings - fee_loss
-        self._wallet['coins'] -= selling_coins
-        self._wallet['cash'] += total_takings
-        self._wallet['profit'] += total_takings
-        self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': 'sell_bid',
+        self._wallet[ASST] -= selling_coins
+        self._wallet[CSH] += total_takings
+        self._wallet[PFT] += total_takings
+        self.curr_trade = {'time_stamp': time.strftime('%m-%d-%Y %H:%M:%S'), 'trade_type': SBID,
                            # 'bid_price': bid_price, 'ask_price': ask_price,
                            'quantity': selling_coins, 'total': total_takings,
                            'fee': fee_loss}
@@ -102,8 +102,8 @@ class Accountant(object):
 
     def __init__(self, name):
         self.name = name
-        self.reader = open(json_report_path, 'rb', os.O_NONBLOCK)
-        self.writer = open(json_report_path, 'w', os.O_NONBLOCK)
+        #self.reader = open(json_report_path, 'rb', os.O_NONBLOCK)
+        #self.writer = open(json_report_path, 'w', os.O_NONBLOCK)
 
     def append_trade_report(self, curr_trade):
         with open(json_report_path, 'a', os.O_NONBLOCK) as appender:
@@ -113,8 +113,8 @@ class Accountant(object):
 
     async def report_history(self, trade_history):
         # trade_history = account.get_trade_history()
-        f_path = json_report_path.format(time.time())
-        with open(f_path, 'w', os.O_NONBLOCK) as writer:
+        f_path = json_report_path.format(time.time().is_integer())
+        with open(f_path, 'wb', os.O_NONBLOCK) as writer:
             json.dump(trade_history, writer)
         await asyncio.sleep(1)
         return True

@@ -95,7 +95,7 @@ class Viewer(object):
                             value='1.001',
                             color=colors['accent'],
                             backgroundColor=colors['background'],
-                            size=24
+                            size=18
                         ),
                         html.Div(
                             className='status-box-title',
@@ -108,7 +108,7 @@ class Viewer(object):
                             value='5.0001',
                             color=colors['accent'],
                             backgroundColor=colors['background'],
-                            size=24
+                            size=18
                         ),
                         html.Div(
                             className='status-box-title',
@@ -379,4 +379,4 @@ class Viewer(object):
 
 
 viewer = Viewer('gym_tv')
-viewer.run_app()
+viewer.run_app(False)

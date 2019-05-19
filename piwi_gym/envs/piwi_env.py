@@ -65,8 +65,8 @@ class TradingPiwiEnv(gym.Env):
             done = done or done_acc
             curr_trade = self.account.get_current_trade()
 
-            coins_row = list(repeat(curr_trade['wallet']['coins'], 10))
-            cash_row = list(repeat(curr_trade['wallet']['cash'], 10))
+            coins_row = list(repeat(curr_trade['wallet'][ASST], 10))
+            cash_row = list(repeat(curr_trade['wallet'][CSH], 10))
             new_ask_obs = np.vstack([new_ask_obs, coins_row])
             new_ask_obs = np.vstack([new_ask_obs, cash_row])
             new_bid_obs = np.vstack([new_bid_obs, coins_row])
@@ -128,7 +128,7 @@ class TradingPiwiEnv(gym.Env):
         '''Standard console Log'''
         wallet_ = self.account.get_wallet()
         pprint(wallet_)
-        profit = wallet_['profit'] - wallet_['loss']
+        profit = wallet_[PFT] - wallet_[LSS]
         print('Your Balance is currently at {} btc'.format(profit))
         print('######' * 25)
 

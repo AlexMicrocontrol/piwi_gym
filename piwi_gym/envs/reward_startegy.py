@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
+from piwi_gym.configs import *
 
 
 class RewardStrategy(ABC):
@@ -15,7 +16,7 @@ class SalesBuysStrategy(object):
         buys = 0
 
         for trade in trade_history:
-            if trade['trade_type'] == 'buy_ask':
+            if trade[TYPE] == 'buy_ask':
                 buys += trade['total']
             else:
                 sales += trade['total']
@@ -32,7 +33,7 @@ class CashStrategy(object):
         self.last_mean = 0.5
 
     def get_reward(self, wallet):
-        reward = wallet['cash'] + wallet['vault']
+        reward = wallet[CSH] + wallet['vault']
         r_d = pd.Series(data=np.asarray([reward], dtype=np.float32))
         rew_df = pd.DataFrame(data=r_d, columns=['rewards'])
         self.reward_history = self.reward_history.append(rew_df)
@@ -57,8 +58,8 @@ class LossProfit(RewardStrategy):
         self.name = name
 
     def get_reward(self, wallet):
-        loss = wallet['loss']
-        profit = wallet['profit']
+        loss = wallet[LSS]
+        profit = wallet[PFT]
         reward = profit - loss
 
         return reward

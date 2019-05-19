@@ -1,4 +1,5 @@
 from piwi_gym.dataIO.data_processor import DataLoader, PlainDataLoader
+from piwi_gym.configs import *
 
 
 class Simulation(object):
@@ -6,8 +7,8 @@ class Simulation(object):
     def __init__(self, configs):
         self._confs = configs
         self.train_conf = self._confs['training']
-        self.data_fname = self._confs['data']['filename']
-        self.i_split = self._confs['data']['train_test_split']
+        self.data_fname = train_file
+        self.i_split = tt_split
         self.cols = self._confs['data']['columns']
         self.seq_len = self._confs['data']['sequence_length']
         self.b_size = self.train_conf['batch_size']

@@ -5,7 +5,7 @@ cwd = os.path.dirname(os.path.abspath(__file__))
 # Viewer
 color_path = glob('{}*/assets/colors.txt'.format(cwd))
 # Trade Report
-json_report_path = glob('{}*/data/account_reports/trade_report_{}.json'.format(cwd, '*'))
+json_report_path = '{}/data/account_reports/trade_report_{}.json'.format(cwd, '{}')
 train_file = glob('{}*/data/training/BTC_ETH_v1_Optimal_Actions.csv'.format(cwd))
 sequence_len = 24
 tt_split = 0.85

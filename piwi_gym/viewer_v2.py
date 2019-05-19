@@ -7,6 +7,7 @@ from dash.dependencies import Input, Output, State
 from piwi_gym.configs import *
 import os
 import json
+from glob import glob
 
 
 class Viewer(object):
@@ -29,10 +30,12 @@ class Viewer(object):
         self.run_app()
 
     def load_trade_report(self):
-        with open(json_report_path, 'r', os.O_NONBLOCK) as reader:
+        f_name = json_report_path.format('*')
+        full_pth = glob(f_name)[0]
+        with open(full_pth, 'r', os.O_NONBLOCK) as reader:
             data = json.load(reader)
 
-        self.trades = data
+            self.trades = data
 
     def serve_layout(self):
         page_layout = html.Div(id='page', children=[
@@ -83,60 +86,62 @@ class Viewer(object):
             children=[
                 html.Div(
                     # id='account-balances',
-                    children=[
-                        html.Div(
-                            className='status-box-title',
-                            children=[
-                                "cash"
-                            ]
-                        ),
-                        daq.LEDDisplay(
-                            id='cash-display',
-                            value='1.001',
-                            color=colors['accent'],
-                            backgroundColor=colors['background'],
-                            size=18
-                        ),
-                        html.Div(
-                            className='status-box-title',
-                            children=[
-                                "assets"
-                            ]
-                        ),
-                        daq.LEDDisplay(
-                            id='coins-display',
-                            value='5.0001',
-                            color=colors['accent'],
-                            backgroundColor=colors['background'],
-                            size=18
-                        ),
-                        html.Div(
-                            className='status-box-title',
-                            children=[
-                                "loss"
-                            ]
-                        ),
-                        daq.LEDDisplay(
-                            id='total-costs',
-                            value='1.0',
-                            color=colors['ultra_purp'],
-                            backgroundColor=colors['background'],
-                            size=18
-                        ),
-                        html.Div(
-                            className='status-box-title',
-                            children=[
-                                "profit"
-                            ]
-                        ),
-                        daq.LEDDisplay(
-                            id='total-earnings',
-                            value='1.0',
-                            color=colors['ultra_purp'],
-                            backgroundColor=colors['background'],
-                            size=18
-                        ),
-                    ]
+                    children=[dcc.Interval(id='wallet_update_interval',
+                                           interval=1000,
+                                           n_intervals=0),
+                              html.Div(
+                                  className='status-box-title',
+                                  children=[
+                                      "cash"
+                                  ]
+                              ),
+                              daq.LEDDisplay(
+                                  id='cash-display',
+                                  value='1.001',
+                                  color=colors['accent'],
+                                  backgroundColor=colors['background'],
+                                  size=18
+                              ),
+                              html.Div(
+                                  className='status-box-title',
+                                  children=[
+                                      "assets"
+                                  ]
+                              ),
+                              daq.LEDDisplay(
+                                  id='coins-display',
+                                  value='5.0001',
+                                  color=colors['accent'],
+                                  backgroundColor=colors['background'],
+                                  size=18
+                              ),
+                              html.Div(
+                                  className='status-box-title',
+                                  children=[
+                                      "loss"
+                                  ]
+                              ),
+                              daq.LEDDisplay(
+                                  id='total-costs',
+                                  value='1.0',
+                                  color=colors['ultra_purp'],
+                                  backgroundColor=colors['background'],
+                                  size=18
+                              ),
+                              html.Div(
+                                  className='status-box-title',
+                                  children=[
+                                      "profit"
+                                  ]
+                              ),
+                              daq.LEDDisplay(
+                                  id='total-earnings',
+                                  value='1.0',
+                                  color=colors['ultra_purp'],
+                                  backgroundColor=colors['background'],
+                                  size=18
+                              ),
+                              ]
                 )
             ]
         )
@@ -166,12 +171,12 @@ class Viewer(object):
         )
         return pwr_box
 
-    def get_line_traces(self, traces, idxs_, prices_, color_):
+    def get_line_traces(self, traces, idxs_, prices_, color_, name):
 
         traces.append(go.Scatter(
             x=idxs_,
             y=prices_,
-            name='ask_price',
+            name=name,
             mode='lines',
             line={
                 'width': 1,
@@ -286,7 +291,6 @@ class Viewer(object):
         self.app.callback(Output('tick-reading-interval', 'interval'),
                           inputs=[Input('power-button', 'on')])(self.update_interval)
 
-
     def update_plot(self, n, on):
         traces = []
         idxs_ = []
@@ -326,8 +330,8 @@ class Viewer(object):
             bid_prices_ = [0.0011 for j in range(0, 50)]
             idxs_ = [k for k in range(0, 50)]
 
-        traces = self.get_line_traces(traces, idxs_, ask_prices_, colors['ultra_purp'])
-        traces = self.get_line_traces(traces, idxs_, bid_prices_, colors['accent'])
+        traces = self.get_line_traces(traces, idxs_, ask_prices_, colors['ultra_purp'], 'ask price')
+        traces = self.get_line_traces(traces, idxs_, bid_prices_, colors['accent'], 'bid price')
         if (on):
             traces = self.get_marker_trace(traces, idxs_, act_prices_,
                                            marker_sizes, act_colors_)
@@ -379,4 +383,4 @@ class Viewer(object):
 
 
 viewer = Viewer('gym_tv')
-viewer.run_app(False)
+viewer.run_app(True)

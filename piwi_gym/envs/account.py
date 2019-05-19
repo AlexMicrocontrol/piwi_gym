@@ -113,8 +113,8 @@ class Accountant(object):
 
     async def report_history(self, trade_history):
         # trade_history = account.get_trade_history()
-        f_path = json_report_path.format(time.time().is_integer())
-        with open(f_path, 'wb', os.O_NONBLOCK) as writer:
+        f_path = json_report_path.format(int(time.time()))
+        with open(f_path, 'w', os.O_NONBLOCK) as writer:
             json.dump(trade_history, writer)
         await asyncio.sleep(1)
         return True

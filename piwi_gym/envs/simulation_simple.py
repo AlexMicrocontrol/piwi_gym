@@ -1,4 +1,4 @@
-from piwi_gym.dataIO.data_processor import DataLoader, PlainDataLoader
+from piwi_gym.dataIO.data_processor import CsvData, PlainData
 from piwi_gym.configs import *
 
 
@@ -13,9 +13,9 @@ class Simulation(object):
         self.seq_len = self._confs['data']['sequence_length']
         self.b_size = self.train_conf['batch_size']
         self.to_norm = self._confs['data']['normalise']
-        self.data_load = PlainDataLoader(self.data_fname,
-                                         self.i_split,
-                                         self.cols)
+        self.data_load = PlainData(self.data_fname,
+                                   self.i_split,
+                                   self.cols)
         self.min_values = self.data_load.data_train.min(axis=0)
         self.max_values = self.data_load.data_train.max(axis=0)
         self.curr_idx = 0

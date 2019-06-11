@@ -1,4 +1,4 @@
-from piwi_gym.dataIO.data_processor import PlainDataLoader, OptimalActionDataLoader
+from piwi_gym.dataIO.data_processor import PlainData, OptimalActionDataLoader
 from piwi_gym.configs import *
 
 

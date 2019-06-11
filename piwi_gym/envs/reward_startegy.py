@@ -2,15 +2,36 @@ import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
 from piwi_gym.configs import *
+import abc
 
 
-class RewardStrategy(ABC):
+class RewardStrategyFactory(object):
+
+    def __init__(self, name='default'):
+        self.name = name
+
+    def create(self, strategy="PlainNegative"):
+        if strategy == "PlainNegative":
+            return PlainNegative()
+        elif strategy == "LossProfit":
+            return LossProfit()
+        elif strategy == "Cash":
+            return Cash()
+        elif strategy == "SalesBuys":
+            return SalesBuys()
+        else:
+            raise NotImplementedError
+
+
+class RewardStrategy(metaclass=abc.ABCMeta):
+
     @abstractmethod
     def get_reward(self, **param):
-        raise NotImplemented
+        """Reward calculation"""
+        pass
 
 
-class SalesBuysStrategy(object):
+class SalesBuys(RewardStrategy):
     def get_reward(self, trade_history):
         sales = 0
         buys = 0
@@ -26,7 +47,7 @@ class SalesBuysStrategy(object):
         return reward
 
 
-class CashStrategy(object):
+class Cash(RewardStrategy):
     def __init__(self):
         data = pd.Series(data=np.asarray([0], dtype=np.float32))
         self.reward_history = pd.DataFrame(data=data, columns=['rewards'])
@@ -42,9 +63,7 @@ class CashStrategy(object):
         return mean_reward
 
 
-class PlainNegativeStartegy(object):
-    def __init__(self):
-        pass
+class PlainNegative(RewardStrategy):
 
     def get_reward(self, data):
         reward = -0.1
@@ -63,11 +82,6 @@ class LossProfit(RewardStrategy):
         reward = profit - loss
 
         return reward
-
-    def get_rewards(self, trade_history):
-        rewards = []
-        for trade in trade_history:
-            wallet = trade['wallet']
 
 
 class OptimalAction(RewardStrategy):

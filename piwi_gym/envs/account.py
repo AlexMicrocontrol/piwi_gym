@@ -30,7 +30,7 @@ class MonitoredAccount(object):
         self.bookkeeping.clear()
         self.bookkeeping.append(self.curr_trade)
 
-    def perform_action(self, action, curr_bid_price, curr_ask_price, curr_idx):
+    def perform_trade_action(self, action, curr_bid_price, curr_ask_price, curr_idx):
         done = False
         if action == BUY:
             done = self.buy_ask(curr_ask_price)
@@ -102,8 +102,8 @@ class Accountant(object):
 
     def __init__(self, name):
         self.name = name
-        #self.reader = open(json_report_path, 'rb', os.O_NONBLOCK)
-        #self.writer = open(json_report_path, 'w', os.O_NONBLOCK)
+        # self.reader = open(json_report_path, 'rb', os.O_NONBLOCK)
+        # self.writer = open(json_report_path, 'w', os.O_NONBLOCK)
 
     def append_trade_report(self, curr_trade):
         with open(json_report_path, 'a', os.O_NONBLOCK) as appender:

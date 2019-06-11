@@ -1,5 +1,6 @@
 import os
 from glob import glob
+
 cwd = os.path.dirname(os.path.abspath(__file__))
 
 # Viewer
@@ -13,7 +14,11 @@ batch_size = 12
 train_epochs = 5
 shouldNormalize = False
 doFeatureEng = False
-columns = ['bid', 'ask', 'sell_vol', 'buy_vol', 'return', 'action']
+columns = ['bid', 'ask',
+           'sell_vol', 'buy_vol',
+           # 'return', 'action'
+           ]
+win_shift = 1
 
 start_cash = 3
 start_assets = 3
@@ -44,4 +49,6 @@ LSS = 'loss'
 PFT = 'profit'
 
 SHOW_ONLY_N_TICKS = 100
+
+REWARD_STRAT = "Cash"
 #

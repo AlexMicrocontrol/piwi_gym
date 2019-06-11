@@ -4,7 +4,7 @@ from gym import spaces
 from piwi_gym.envs.account import MonitoredAccount, Accountant
 from piwi_gym.envs.simulation_feature_eng import SimulationFE
 from itertools import repeat
-from piwi_gym.envs.reward_startegy import LossProfit
+from piwi_gym.envs.reward_startegy import RewardStrategyFactory
 from piwi_gym.configs import *
 from prettyprinter import pprint
 import numpy as np
@@ -12,11 +12,12 @@ import numpy as np
 
 class TradingPiwiEnv(gym.Env):
     """Custom Environment that follows gym interface"""
-    metadata = {'render.modes': ['human']}
+    metadata = {'render.modes': ['human', 'console']}
 
     def __init__(self):
         super(TradingPiwiEnv, self).__init__()
-        self.reward_strategy = LossProfit()
+        self.strat_factory = RewardStrategyFactory()
+        self.reward_strategy = self.strat_factory.create(REWARD_STRAT)
         self.sim = SimulationFE()
         self.account = MonitoredAccount(start_cash,
                                         start_assets,
@@ -32,7 +33,7 @@ class TradingPiwiEnv(gym.Env):
         if not done:
             curr_bid_price = obs[-1][0]
             curr_ask_price = obs[-1][1]
-            done_acc = self.account.perform_action(action, curr_bid_price, curr_ask_price, self.sim.curr_idx)
+            done_acc = self.account.perform_trade_action(action, curr_bid_price, curr_ask_price, self.sim.curr_idx)
             done = done or done_acc
             curr_trade = self.account.get_current_trade()
             reward = self.reward_strategy.get_reward(curr_trade)
@@ -42,47 +43,7 @@ class TradingPiwiEnv(gym.Env):
         else:
             raise StopIteration
 
-        return obs, action, reward, info,
-
-    def step_a(self, actions):
-        # Return the observation, done, reward from Simulator and Portfolio
-        new_ask_obs, new_bid_obs, rets_and_optimal_actions, done = self.sim.step()
-        if not done:
-            curr_bid_price = new_bid_obs[-1][0]
-            curr_ask_price = new_ask_obs[-1][0]
-            sel_act, buy_act = actions
-            sb_i = np.argmax(sel_act[-1])
-            bb_i = np.argmax(buy_act[-1])
-
-            if sel_act[-1][sb_i] > buy_act[-1][bb_i]:
-                action = sb_i
-            elif sel_act[-1][sb_i] < buy_act[-1][bb_i]:
-                action = bb_i
-            else:
-                action = HOLD
-
-            done_acc = self.account.perform_action(action, curr_bid_price, curr_ask_price, self.sim.curr_idx)
-            done = done or done_acc
-            curr_trade = self.account.get_current_trade()
-
-            coins_row = list(repeat(curr_trade['wallet'][ASST], 10))
-            cash_row = list(repeat(curr_trade['wallet'][CSH], 10))
-            new_ask_obs = np.vstack([new_ask_obs, coins_row])
-            new_ask_obs = np.vstack([new_ask_obs, cash_row])
-            new_bid_obs = np.vstack([new_bid_obs, coins_row])
-            new_bid_obs = np.vstack([new_bid_obs, cash_row])
-
-            reward = self.reward_strategy.get_reward(curr_trade['wallet'])
-            _tmp_rew = [-0.1, -0.1]
-            _tmp_rew[action] = reward
-            reward = np.asarray(_tmp_rew)
-            info = self.account.get_trade_history()
-            # self.accountant.report_trade(curr_trade)
-
-        else:
-            raise StopIteration
-
-        return new_ask_obs, new_bid_obs, sel_act, buy_act, reward, info, done
+        return obs, action, reward, info, done
 
     def step(self, actions):
         # Return the observation, done, reward from Simulator and Portfolio
@@ -98,10 +59,10 @@ class TradingPiwiEnv(gym.Env):
                 act_ = np.argmax(actions[-1])
             else:
                 act_ = actions
-            done_acc = self.account.perform_action(act_,
-                                                   curr_bid_price,
-                                                   curr_ask_price,
-                                                   self.sim.curr_idx)
+            done_acc = self.account.perform_trade_action(act_,
+                                                         curr_bid_price,
+                                                         curr_ask_price,
+                                                         self.sim.curr_idx)
             done = done or done_acc
             curr_trade = self.account.get_current_trade()
             # self.accountant.append_trade_report(curr_trade)

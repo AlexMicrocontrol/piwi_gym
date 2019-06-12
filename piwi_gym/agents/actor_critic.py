@@ -169,9 +169,9 @@ class ActorCritic:
     def act(self, cur_state):
         self.epsilon *= self.epsilon_decay
         if np.random.random() < self.epsilon:
-            rnd_act = np.random.random_sample((cur_state.shape[0], 3))
+            rnd_act = np.random.random_sample(3)
             return rnd_act
-        return self.actor_model.predict(cur_state)
+        return self.actor_model.predict(cur_state[0])
 
 
 

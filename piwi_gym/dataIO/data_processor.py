@@ -8,9 +8,9 @@ class Loader(metaclass=ABCMeta):
     def __init__(self, name="Loader"):
         self.name = name
 
-    @abstractmethod
-    def _load_from(self, filename, split, cols):
-        pass
+    # @abstractmethod
+    # def _load_from(self, filename, split, cols):
+    #     pass
 
     @abstractmethod
     def get_test_data(self, seq_len, should_norm):
@@ -74,11 +74,12 @@ class CsvData(Loader):
 
     def __init__(self, filename, split, cols):
         super().__init__("CsvData")
-        self.data_train = None
-        self.data_test = None
-        self.len_train = 0
-        self.len_test = 0
-        self._load_from(filename, split, cols)
+        dataframe = pd.read_csv(filename, delimiter=";")
+        i_split = int(len(dataframe) * split)
+        self.data_train = dataframe[cols].values[:i_split]
+        self.data_test = dataframe[cols].values[i_split:]
+        self.len_train = len(self.data_train)
+        self.len_test = len(self.data_test)
 
     def _load_from(self, filename, split, cols):
         dataframe = pd.read_csv(filename, delimiter=';')

@@ -54,7 +54,7 @@ class Cash(RewardStrategy):
         self.last_mean = 0.5
 
     def get_reward(self, wallet):
-        reward = wallet[CSH] + wallet['vault']
+        reward = wallet[CSH]
         r_d = pd.Series(data=np.asarray([reward], dtype=np.float32))
         rew_df = pd.DataFrame(data=r_d, columns=['rewards'])
         self.reward_history = self.reward_history.append(rew_df)

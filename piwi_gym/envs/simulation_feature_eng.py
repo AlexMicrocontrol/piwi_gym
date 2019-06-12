@@ -4,6 +4,8 @@ from piwi_gym.configs import *
 
 class SimulationFE(object):
 
+
+    'deprecated'
     def __init__(self):
         self.data_fname = train_file[0]
         self.i_split = tt_split

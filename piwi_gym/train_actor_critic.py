@@ -5,6 +5,7 @@ import gym
 import piwi_gym
 import sys
 import os
+import numpy as np
 
 def main(env, agent):
     env = env
@@ -15,7 +16,8 @@ def main(env, agent):
 
     while not done:
         actions = actor_critic.act(_obs)
-        new_obs, reward, info, done = env.step(actions)
+        action = np.argmax(actions)
+        new_obs, action, reward, info, done = env.step(action)
         actor_critic.remember_sale(_obs, actions, reward, new_obs, done)
         actor_critic.train()
 
